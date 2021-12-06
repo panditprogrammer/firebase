@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase CRUD (Create Read update delete) </title>
+</head>
+
+<body>
+    <h3>Firebase Insert or update data </h3>
+    <input type="text" id="namef" placeholder="name"> <br><br>
+    <input type="email" id="emailf" placeholder="email"> <br><br>
+    <input type="phone" id="phonef" placeholder="phone"> <br><br>
+    <button id="send">Insert</button>
+    <button id="update">update</button>
+
+    <br><br>
+    <h3>firebase Read Your Info here </h3>
+    <input type="text" id="getname" placeholder="Enter your username"> <br><br>
+    <button id="receive">Read Your Info</button>
+
+    <div id="showInfo">
+        <!-- data goes here  -->
+    </div>
+
+    <h3>Delete data from firebase</h3>
+    <input type="text" id="deleteforname" placeholder="name"> <br><br>
+    <button id="delete">delete</button>
+
+
+
+
+
+
+</body>
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+    import { getDatabase, ref, onValue, child, set, get, update, remove } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-database.js";
+
+    // Your web app's Firebase 'realtimedatabase' configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyBYDDocbwDT7sCB5i7hTCQNNWbNNKZCZH0",
+        authDomain: "fir-example-7f419.firebaseapp.com",
+        databaseURL: "https://fir-example-7f419-default-rtdb.firebaseio.com",
+        projectId: "fir-example-7f419",
+        storageBucket: "fir-example-7f419.appspot.com",
+        messagingSenderId: "816724511653",
+        appId: "1:816724511653:web:3daa5e2144c23f7f8a364c"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    // first step to 
+    const database = getDatabase(app);
+
+    // some global variables
+    let name = document.getElementById("namef");
+    let email = document.getElementById("emailf");
+    let phone = document.getElementById("phonef");
+    let showDivInfo = document.getElementById("showInfo");
+
+    // onclicks
+    document.getElementById("send").addEventListener("click", insertData);
+    document.getElementById("receive").addEventListener("click", receiveData);
+    document.getElementById("update").addEventListener("click", updateData);
+    document.getElementById("delete").addEventListener("click", deleteData);
+
+
+
+    // save data to firebase 
+    function insertData() {
+        // Insert the data 
+        if (name.value != "" && email.value != "" && phone.value != "") {
+
+            set(ref(database, '/students/' + name.value), {
+                dname: name.value,
+                demail: email.value,
+                dphone: phone.value
+            });
+
+            alert("Inserted ");
+        }
+        else {
+            alert("Please fill the require field");
+        }
+
+
+    }
+
+    // receive data from firebase
+    function receiveData() {
+        // connection with firebase 
+        if (getname.value != "") {
+            const starCountRef = ref(database, 'students/' + getname.value);
+
+            onValue(starCountRef, (snapshot) => {
+                let data = snapshot.val();
+                // check data exist
+                if (snapshot.val()) {
+                    showDivInfo.innerHTML = ` <h3>Username : ${data['dname']} </h3>
+                                            <p>Email : ${data['demail']} </p>
+                                            <p>Phone : ${data['dphone']} </p>`;
+
+                }
+                else {
+                    alert("data not found");
+                }
+
+            });
+
+        } else {
+            alert("Please fill the require field");
+        }
+    }
+
+    // update data 
+    function updateData() {
+
+        if (name.value != "" && email.value != "" && phone.value != "") {
+            // update the data same as insert data  
+            update(ref(database, '/students/' + name.value), {
+                dname: name.value,
+                demail: email.value,
+                dphone: phone.value
+            });
+
+            alert("Updated ");
+        }
+        else {
+            alert("Please fill the require field");
+        }
+    }
+
+    // delete data 
+    function deleteData() {
+        if (deleteforname.value != "") {
+            // remove the data from firebase
+            remove(ref(database, '/students/' + deleteforname.value));
+
+            alert("deleted ");
+        }
+        else {
+            alert("data not found");
+        }
+    }
+
+    
+</script>
+
+</html>
